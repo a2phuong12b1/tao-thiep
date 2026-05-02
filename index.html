@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Thiệp Tự Động</title>
+    <!-- Thư viện cắt ảnh Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>TẠO THIỆP MỜI SỰ KIỆN</h2>
+        
+        <div class="input-group">
+            <label>1. Chọn ảnh của bạn:</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <!-- Khu vực hiển thị ảnh để cắt -->
+        <div class="cropper-container" style="display:none;">
+            <img id="imageToCrop">
+            <button id="cropButton">Xác nhận cắt ảnh</button>
+        </div>
+
+        <div class="input-group">
+            <label>2. Nhập họ tên:</label>
+            <input type="text" id="userName" placeholder="Ví dụ: NGUYỄN VĂN A">
+        </div>
+
+        <button id="generateBtn">TẠO THIỆP NGAY</button>
+
+        <hr>
+        <div id="resultArea" style="display:none;">
+            <h3>Kết quả của bạn:</h3>
+            <canvas id="mainCanvas"></canvas>
+            <br>
+            <button id="downloadBtn">TẢI THIỆP VỀ MÁY</button>
+        </div>
+    </div>
+
+    <!-- Script thư viện -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
