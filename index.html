@@ -7,67 +7,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
         * { box-sizing: border-box; }
-        body {
-            margin: 0; padding: 0;
-            background: #004d25;
-            display: flex; justify-content: center;
-            overflow-x: hidden;
-        }
-        .app-container {
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-            background: #fff;
-            min-height: 100vh;
-        }
-        .card-wrapper {
-            position: relative;
-            width: 100%;
-        }
-        #phoi-bg {
-            width: 100%;
-            display: block;
-        }
-        /* CĂN CHỈNH VÒNG TRÒN PREVIEW */
+        body { margin: 0; padding: 0; background: #004d25; display: flex; justify-content: center; overflow-x: hidden; font-family: sans-serif; }
+        .app-container { width: 100%; max-width: 500px; position: relative; background: #fff; min-height: 100vh; }
+        .card-wrapper { position: relative; width: 100%; }
+        #phoi-bg { width: 100%; display: block; }
+        
+        /* CĂN CHỈNH PREVIEW THEO TỈ LỆ % */
         .photo-slot {
             position: absolute;
-            top: 26%; /* Tọa độ dọc */
-            left: 76.5%; /* Tọa độ ngang */
-            width: 29%;  /* ĐÃ THU NHỎ để khớp vòng vàng */
+            top: 25.8%; /* Tọa độ dọc của vòng tròn vàng */
+            left: 76.5%; /* Tọa độ ngang của vòng tròn vàng */
+            width: 31%;  /* Độ lớn vòng tròn */
             aspect-ratio: 1/1;
             transform: translate(-50%, 0);
             z-index: 5;
             border-radius: 50%;
             overflow: hidden;
-            border: 1px solid #ffcc00; /* Viền chỉ dẫn nhẹ */
         }
-        .cropper-container { background: transparent !important; }
-        .cropper-modal { opacity: 0.1 !important; }
-
-        .controls {
-            position: relative;
-            padding: 20px;
-            z-index: 100;
-            background: #fff;
-        }
-        input[type="text"] {
-            width: 100%; padding: 12px; margin-bottom: 10px;
-            border: 2px solid #ffcc00; border-radius: 25px;
-            text-align: center; font-weight: bold; outline: none;
-        }
-        .btn-upload {
-            background: #ffcc00; color: #004d25;
-            padding: 12px; border-radius: 25px;
-            display: block; text-align: center;
-            font-weight: bold; cursor: pointer; margin-bottom: 10px;
-        }
-        .btn-generate {
-            background: #004d25; color: #fff;
-            border: none; padding: 15px;
-            width: 100%; border-radius: 25px;
-            font-weight: bold; cursor: pointer;
-            font-size: 16px;
-        }
+        
+        .controls { padding: 20px; background: #fff; border-radius: 20px 20px 0 0; margin-top: -20px; position: relative; z-index: 10; }
+        input[type="text"] { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #ffcc00; border-radius: 30px; text-align: center; font-weight: bold; font-size: 16px; outline: none; }
+        .btn-upload { background: #ffcc00; color: #004d25; padding: 15px; border-radius: 30px; display: block; text-align: center; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
+        .btn-generate { background: #004d25; color: #fff; border: none; padding: 18px; width: 100%; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         #mainCanvas { display: none; }
     </style>
 </head>
@@ -76,8 +37,8 @@
 <div class="app-container">
     <div class="card-wrapper">
         <img id="phoi-bg" src="phoi-thiep.png" alt="Phôi Thiệp">
-        <div class="photo-slot" id="slot">
-            <img id="imageToCrop" src="" style="display: none;">
+        <div class="photo-slot">
+            <img id="imageToCrop" style="display: none;">
         </div>
     </div>
 
@@ -89,7 +50,6 @@
         <input type="text" id="userName" placeholder="BƯỚC 2: NHẬP TÊN CỦA BẠN">
         <button class="btn-generate" id="generateBtn">BƯỚC 3: TẠO & TẢI THIỆP</button>
     </div>
-
     <canvas id="mainCanvas"></canvas>
 </div>
 
@@ -115,7 +75,6 @@
                     viewMode: 1,
                     dragMode: 'move',
                     guides: false,
-                    center: false,
                     highlight: false,
                     cropBoxMovable: false,
                     cropBoxResizable: false,
@@ -131,38 +90,44 @@
         if (!name || !cropper) return alert("Vui lòng chọn ảnh và nhập tên!");
 
         const template = new Image();
-        template.crossOrigin = "anonymous";
         template.src = 'phoi-thiep.png';
 
         template.onload = () => {
-            mainCanvas.width = template.width;
-            mainCanvas.height = template.height;
+            // Lấy kích thước thật của phôi ảnh
+            const W = template.width;
+            const H = template.height;
+            mainCanvas.width = W;
+            mainCanvas.height = H;
             
+            // 1. Vẽ phôi
             ctx.drawImage(template, 0, 0);
 
-            // CẮT ẢNH TRÒN VỚI TỌA ĐỘ CHUẨN TRÊN PHÔI 1000px
-            const croppedCanvas = cropper.getCroppedCanvas({ width: 500, height: 500 });
+            // 2. Tính toán tọa độ vẽ ảnh dựa theo tỉ lệ kích thước phôi
+            const croppedCanvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
+            
+            const circleX = W * 0.765; // Tâm ngang (76.5%)
+            const circleY = H * 0.405; // Tâm dọc (40.5%)
+            const radius = W * 0.155;  // Bán kính (15.5%)
             
             ctx.save();
             ctx.beginPath();
-            const circleX = 765; // Tâm ngang
-            const circleY = 405; // Tâm dọc
-            const radius = 155;  // ĐÃ THU NHỎ BÁN KÍNH ĐỂ VỪA VÒNG VÀNG
-            
             ctx.arc(circleX, circleY, radius, 0, Math.PI * 2);
             ctx.clip();
             ctx.drawImage(croppedCanvas, circleX - radius, circleY - radius, radius * 2, radius * 2);
             ctx.restore();
 
-            // VIẾT TÊN VÀO Ô ĐỎ
-            ctx.font = "bold 45px Arial";
+            // 3. Viết tên vào ô đỏ dựa theo tỉ lệ
+            const fontSize = Math.round(W * 0.045); // Font chữ tự co giãn theo phôi
+            ctx.font = `bold ${fontSize}px Arial`;
             ctx.fillStyle = "#ffffff";
             ctx.textAlign = "center";
-            ctx.fillText(name.toUpperCase(), 765, 642);
+            // Tọa độ tên (76.5% ngang, 64.2% dọc)
+            ctx.fillText(name.toUpperCase(), W * 0.765, H * 0.642);
 
+            // 4. Xuất ảnh
             const link = document.createElement('a');
-            link.download = 'thiep-duyen-thi.png';
-            link.href = mainCanvas.toDataURL('image/png');
+            link.download = 'thiep-moi-duyen-thi.png';
+            link.href = mainCanvas.toDataURL('image/png', 1.0);
             link.click();
         };
     };
