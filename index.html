@@ -2,158 +2,187 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo Thiệp Sự Kiện 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Duyên Thị - Tạo Thiệp Mời</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
+        * { box-sizing: border-box; }
         body {
-            margin: 0; padding: 10px; font-family: 'Arial', sans-serif;
-            background: #1a1a2e; color: #fff; display: flex; justify-content: center;
+            margin: 0; padding: 0;
+            background: #004d25; /* Màu xanh chủ đạo Duyên Thị */
+            display: flex; justify-content: center;
+            overflow-x: hidden;
         }
-        .container {
-            background: #fff; color: #333; padding: 20px;
-            border-radius: 15px; max-width: 400px; width: 100%; text-align: center;
+        .app-container {
+            width: 100%;
+            max-width: 500px; /* Độ rộng tối đa cho mobile */
+            position: relative;
+            background: #fff;
+            min-height: 100vh;
         }
-        
-        /* KHU VỰC LIVE PREVIEW */
-        .preview-wrapper {
+        /* Phôi thiệp nền tràn màn hình */
+        .card-wrapper {
             position: relative;
             width: 100%;
-            margin: 15px 0;
-            display: none;
         }
-        #phoi-bg { width: 100%; display: block; border-radius: 10px; }
-        
-        .cropper-box {
+        #phoi-bg {
+            width: 100%;
+            display: block;
+        }
+        /* Khung chứa ảnh người dùng - Nằm đè lên phôi */
+        .photo-slot {
             position: absolute;
-            top: 25%; /* Căn chỉnh để khớp với hình tròn đen của phôi */
-            left: 63.5%; 
-            width: 32%; /* Tỉ lệ kích thước hình tròn */
+            top: 26.2%; /* Tọa độ khớp với vòng tròn vàng */
+            left: 50%;
+            width: 41%; /* Độ rộng vòng tròn */
             aspect-ratio: 1/1;
-            transform: translateX(-50%);
+            transform: translateX(33%); /* Đẩy sang phải để khớp vòng tròn đen */
             z-index: 5;
-            border-radius: 50%; /* Tạo khung tròn cho ảnh preview */
+            border-radius: 50%;
             overflow: hidden;
-            border: 2px solid gold;
         }
-        
-        .img-container { width: 100%; height: 100%; }
-        
-        /* Tinh chỉnh Cropper */
-        .cropper-view-box, .cropper-face { border-radius: 50%; }
-        .cropper-modal { background-color: rgba(0,0,0,0.1) !important; }
+        .cropper-container { background: transparent !important; }
+        .cropper-modal { opacity: 0.1 !important; }
 
-        input[type="text"] {
-            width: 100%; padding: 12px; margin: 10px 0;
-            border: 2px solid #2d5a27; border-radius: 8px; text-align: center;
+        /* Form nhập liệu nằm dưới cùng hoặc nổi lên trên */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0; width: 100%;
+            padding: 0 20px;
+            z-index: 100;
         }
-        .btn {
-            background: #2d5a27; color: white; border: none;
-            padding: 12px; width: 100%; border-radius: 8px;
+        input[type="text"] {
+            width: 100%; padding: 12px; margin-bottom: 10px;
+            border: 2px solid #ffcc00; border-radius: 25px;
+            text-align: center; font-weight: bold; outline: none;
+        }
+        .btn-upload {
+            background: #ffcc00; color: #004d25;
+            padding: 12px; border-radius: 25px;
+            display: block; text-align: center;
+            font-weight: bold; cursor: pointer; margin-bottom: 10px;
+        }
+        .btn-generate {
+            background: #fff; color: #004d25;
+            border: 2px solid #004d25; padding: 12px;
+            width: 100%; border-radius: 25px;
             font-weight: bold; cursor: pointer;
         }
-        canvas { width: 100%; border-radius: 10px; margin-top: 15px; display: none; }
+        #mainCanvas { display: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h3 style="color: #2d5a27;">HỆ THỐNG TẠO THIỆP</h3>
-        <input type="file" id="imageInput" accept="image/*">
 
-        <div class="preview-wrapper" id="previewWrapper">
-            <img id="phoi-bg" src="phoi-thiep.jpg">
-            <div class="cropper-box">
-                <div class="img-container"><img id="imageToCrop"></div>
-            </div>
+<div class="app-container">
+    <div class="card-wrapper">
+        <!-- Ảnh phôi thiệp -->
+        <img id="phoi-bg" src="phoi-thiep.png" alt="Phôi Thiệp">
+        
+        <!-- Vòng tròn để người dùng di chuyển ảnh trực tiếp trên thiệp -->
+        <div class="photo-slot" id="slot">
+            <img id="imageToCrop" src="" style="display: none;">
         </div>
-
-        <input type="text" id="userName" placeholder="NHẬP HỌ TÊN CỦA BẠN">
-        <button class="btn" id="generateBtn">TẠO THIỆP & TẢI VỀ</button>
-        <canvas id="mainCanvas"></canvas>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script>
-        const imageInput = document.getElementById('imageInput');
-        const imageToCrop = document.getElementById('imageToCrop');
-        const generateBtn = document.getElementById('generateBtn');
-        const mainCanvas = document.getElementById('mainCanvas');
-        const ctx = mainCanvas.getContext('2d');
-        let cropper;
+    <div class="controls">
+        <label class="btn-upload">
+            BƯỚC 1: CHỌN ẢNH CỦA BẠN
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        </label>
+        
+        <input type="text" id="userName" placeholder="BƯỚC 2: NHẬP TÊN CỦA BẠN">
+        
+        <button class="btn-generate" id="generateBtn">BƯỚC 3: TẠO & TẢI THIỆP</button>
+    </div>
 
-        imageInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    imageToCrop.src = event.target.result;
-                    document.getElementById('previewWrapper').style.display = 'block';
-                    if (cropper) cropper.destroy();
-                    cropper = new Cropper(imageToCrop, {
-                        aspectRatio: 1,
-                        viewMode: 1,
-                        dragMode: 'move',
-                        guides: false,
-                        center: false,
-                        highlight: false,
-                        cropBoxMovable: false,
-                        cropBoxResizable: false,
-                        toggleDragModeOnDblclick: false,
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-        };
+    <canvas id="mainCanvas"></canvas>
+</div>
 
-        generateBtn.onclick = () => {
-            const name = document.getElementById('userName').value;
-            if (!name || !cropper) return alert("Vui lòng chọn ảnh và nhập tên!");
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const generateBtn = document.getElementById('generateBtn');
+    const mainCanvas = document.getElementById('mainCanvas');
+    const ctx = mainCanvas.getContext('2d');
+    let cropper;
 
-            const template = new Image();
-            template.crossOrigin = "anonymous";
-            template.src = 'phoi-thiep.jpg';
-
-            template.onload = () => {
-                mainCanvas.width = template.width;
-                mainCanvas.height = template.height;
+    // Khi chọn ảnh
+    imageInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                imageToCrop.src = event.target.result;
+                imageToCrop.style.display = 'block';
+                if (cropper) cropper.destroy();
                 
-                // 1. Vẽ phôi thiệp
-                ctx.drawImage(template, 0, 0);
-
-                // 2. Cắt ảnh cá nhân thành hình tròn
-                const croppedCanvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
-                
-                ctx.save();
-                ctx.beginPath();
-                // Vẽ một hình tròn mặt nạ (x, y, radius)
-                // Căn chỉnh tọa độ x, y để khớp với vòng tròn vàng trên phôi
-                const circleX = 760; // Tọa độ ngang trung tâm hình tròn đen
-                const circleY = 405; // Tọa độ dọc trung tâm hình tròn đen
-                const radius = 188;  // Bán kính hình tròn
-                
-                ctx.arc(circleX, circleY, radius, 0, Math.PI * 2);
-                ctx.closePath();
-                ctx.clip(); // Cắt theo hình tròn đã vẽ
-
-                // Vẽ ảnh cá nhân vào vị trí đã clip
-                ctx.drawImage(croppedCanvas, circleX - radius, circleY - radius, radius * 2, radius * 2);
-                ctx.restore();
-
-                // 3. Viết tên vào Ô ĐỎ
-                ctx.font = "bold 45px Arial";
-                ctx.fillStyle = "white"; // Chỉnh màu chữ cho nổi bật trên nền xanh
-                ctx.textAlign = "center";
-                // Tọa độ 760 là cột bên phải, 640 là chiều cao ô đỏ
-                ctx.fillText(name.toUpperCase(), 760, 640);
-
-                // 4. Hiển thị và Tải về
-                mainCanvas.style.display = 'block';
-                const link = document.createElement('a');
-                link.download = 'thiep-moi-2026.png';
-                link.href = mainCanvas.toDataURL('image/png');
-                link.click();
+                cropper = new Cropper(imageToCrop, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    guides: false,
+                    center: false,
+                    highlight: false,
+                    cropBoxMovable: false,
+                    cropBoxResizable: false,
+                    autoCropArea: 1,
+                    toggleDragModeOnDblclick: false,
+                });
             };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Khi nhấn Tạo thiệp
+    generateBtn.onclick = () => {
+        const name = document.getElementById('userName').value;
+        if (!name || !cropper) return alert("Vui lòng chọn ảnh và nhập tên!");
+
+        const template = new Image();
+        template.crossOrigin = "anonymous";
+        template.src = 'phoi-thiep.jpg';
+
+        template.onload = () => {
+            // Kích thước chuẩn của phôi
+            mainCanvas.width = template.width;
+            mainCanvas.height = template.height;
+            
+            // 1. Vẽ phôi
+            ctx.drawImage(template, 0, 0);
+
+            // 2. Vẽ ảnh đại diện (Hình tròn)
+            const croppedCanvas = cropper.getCroppedCanvas({ width: 500, height: 500 });
+            
+            ctx.save();
+            ctx.beginPath();
+            // Căn tọa độ X, Y chuẩn theo phôi gốc (Tỉ lệ 1000x1000)
+            const circleX = 765; 
+            const circleY = 405; 
+            const radius = 195; 
+            
+            ctx.arc(circleX, circleY, radius, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(croppedCanvas, circleX - radius, circleY - radius, radius * 2, radius * 2);
+            ctx.restore();
+
+            // 3. Viết tên vào ô đỏ
+            ctx.font = "bold 45px Arial";
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.fillText(name.toUpperCase(), 765, 642);
+
+            // 4. Tải về
+            const link = document.createElement('a');
+            link.download = 'thiep-duyen-thi.png';
+            link.href = mainCanvas.toDataURL('image/png');
+            link.click();
         };
-    </script>
+        
+        template.onerror = () => alert("Không tìm thấy file phoi-thiep.jpg! Hãy kiểm tra lại tên file.");
+    };
+</script>
+
 </body>
 </html>
