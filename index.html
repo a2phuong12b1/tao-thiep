@@ -1,117 +1,742 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
+<html><head>
+    <title>KICHHOATHUYET – Follow Me</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo Thiệp Tự Động</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <style>
-        /* PHẦN CSS - LÀM NỀN SANG TRỌNG */
+    <meta charset="utf-8">
+    <meta name="description" content="Công cụ tạo thiệp online. KICHHOATHUYET – Follow Me">
+    <meta property="og:title" content="KICHHOATHUYET – Follow Me">
+    <meta property="og:description" content="Công cụ tạo thiệp online. KICHHOATHUYET – Follow Me">
+    <meta name="robots" content="noindex, nofollow">
+        <style>
+        *{
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+        body{
+            font-size: 14px;
+        }
+        .flex.canvas-row.justify-center {
+            position: relative;
+        }
+        span#point {
+            position: absolute;
+        }
+
+                                                
         body {
-            margin: 0; padding: 20px; font-family: sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff; display: flex; justify-content: center;
+            display: flex;
+            display: -webkit-flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #c94b4b;
+            background: -webkit-linear-gradient(to right, #4b134f, #c94b4b);
+            background: linear-gradient(to right, #4b134f, #c94b4b);
+            font-family: Inter, 'Segoe UI', sans-serif;
         }
-        .container {
-            background: white; color: #333; padding: 30px;
-            border-radius: 20px; max-width: 500px; width: 100%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center;
+
+        .flex {
+            display: flex;
         }
-        input[type="text"] {
-            width: 100%; padding: 15px; margin: 15px 0;
-            border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box;
+
+        .flex-column {
+            flex-direction: column;
         }
-        button {
-            background: #e94560; color: white; border: none;
-            padding: 15px; width: 100%; border-radius: 10px;
-            font-weight: bold; cursor: pointer; margin-top: 10px;
+
+        .justify-center {
+            justify-content: center;
         }
-        .img-container { max-height: 400px; overflow: hidden; margin-bottom: 10px; }
-        canvas { width: 100%; border-radius: 10px; margin-top: 20px; border: 1px solid #ddd; }
+
+        .align-center {
+            align-items: center;
+        }
+
+        .input-row {
+            display: flex;
+        }
+
+        .input-row > .row-name {
+            padding: 20px 0;
+            width: 870px;
+        }
+
+        #id_upload {
+            width: 20%;
+        }
+
+        .canvas-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #id_main_canvas {
+            max-width: 100%;
+            height: auto;
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        }
+
+        .horizontal {
+            margin: 10px 0 40px;
+        }
+
+        #id_width_pos {
+            width: 100% !important;
+            margin-bottom: 10px;
+        }
+
+        #label-zoom, #label-width, #label-height {
+            font-size: 15px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .download-btn > #download {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 50px 0;
+            width: fit-content;
+            background: #159957;
+            background: -webkit-linear-gradient(to right, #155799, #159957);
+            background: linear-gradient(to right, #155799, #159957);
+        }
+
+        .full_name {
+            border: none;
+            padding: 0 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            outline: none;
+            margin: 0 0 10px 0;
+        }
+        .row-name.flex {
+            justify-content: center !important;
+            flex-flow: row wrap;
+        }
+        .flex-col{
+            width: 50%;
+            padding: 0 10px;
+        }
+        .upload_btn {
+            width: 25%;
+            font-size: 14px;
+            font-weight: 400;
+            color: #ffffff;
+            border-radius: 100px;
+            background: #642B73;
+            background: -webkit-linear-gradient(to right, #C6426E, #642B73);
+            background: linear-gradient(to right, #C6426E, #642B73);
+            text-align: center;
+            cursor: pointer;
+            padding: 0.9rem;
+            box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+        }
+
+        .hidden_img {
+            display: none;
+        }
+
+        .vertical_silder {
+            height: 100%;
+            -webkit-appearance: slider-vertical;
+            margin-bottom: 10px;
+        }
+
+        .horizontal > div {
+            width: 33.333%;
+            padding: 0 10px;
+        }
+
+        .horizontal > div input[type="range"] {
+            width: 100%;
+        }
+
+        @media (max-width: 1199.98px) {
+            .canvas-row {
+                flex-direction: column;
+            }
+
+            .canvas-row > .left {
+                margin-top: 2rem;
+                order: 1
+            }
+
+            .canvas-row > .right {
+                margin-top: 2rem;
+                order: 2
+            }
+
+            .vertical_silder, #id_width_pos {
+                width: 75%;
+            }
+
+            .horizontal {
+                width: 100%;
+            }
+
+            .download-btn > #download {
+                margin-top: 2rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .container {
+                padding-bottom: 1rem;
+            }
+
+            .canvas-row {
+                flex-direction: column;
+            }
+
+            .canvas-row > #id_main_canvas {
+                max-width: 100% !important;
+                order: 0;
+            }
+
+            .canvas-row > .left {
+                margin-top: 1rem;
+                order: 1
+            }
+
+            .canvas-row > .right {
+                margin-top: 1rem;
+                order: 2
+            }
+
+            .vertical_silder, #id_width_pos {
+                width: 75%;
+            }
+
+            .horizontal {
+                width: 100%;
+            }
+
+        }
+        .row-name.flex {
+            padding: 20px 0;
+        }
+
+        #iphone_mess{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            display: none;
+        }
+        #iphone_mess strong {
+            color: red;
+            border: 1px dashed red;
+            display: inline-block;
+            border-radius: 20px;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        img{
+            max-width: 100%;
+            height: auto;
+        }
+
+        div#note_mess,
+        .note_mess{
+            width: 100%;
+            margin: 20px auto;
+            text-align: center;
+            padding: 0 10px;
+            display: none;
+        }
+
+        div#note_mess strong,
+        .note_mess strong{
+            color: red;
+            border: 1px dashed red;
+            display: inline-block;
+            border-radius: 20px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+        #iphone_mess.active,
+        #note_mess.active,
+        .note_mess.active{
+            display: block !important;
+        }
+
+        @media (max-width: 530px) {
+            label#id_upload {
+                padding: 10px 5px;
+                font-size: 14px;
+                border-radius: 10px;
+                width: 100% !important;
+                max-width: initial;
+                display: block;
+            }
+            .horizontal > div {
+                width: 100%;
+            }
+            .horizontal {
+                display: block;
+            }
+            .horizontal > div {
+                margin-bottom: 10px;
+                padding: 0 10px;
+                width: auto;
+            }
+        }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>TẠO THIỆP MỜI</h1>
-        <div id="input-area">
-            <input type="file" id="imageInput" accept="image/*">
-            <div id="cropArea" style="display:none; margin-top: 20px;">
-                <div class="img-container"><img id="imageToCrop"></div>
-                <button id="cropButton">CẮT ẢNH</button>
-            </div>
-            <input type="text" id="userName" placeholder="NHẬP HỌ TÊN CỦA BẠN">
-            <button id="generateBtn">TẠO THIỆP NGAY</button>
+
+    <script type="text/javascript">
+
+        const images = document.querySelectorAll('img.no-lazy');
+        images.forEach(img => {
+            let src = img.getAttribute('data-src');
+            img.setAttribute('src', src);
+        });
+
+        function onClickBtnPickImg() {
+            var inputBtn = document.getElementById("id_file_up");
+            inputBtn.click();
+        }
+
+        function onClickBtnInputFile() {
+            this.value = null;
+        }
+
+        function onNameChange() {
+            updateCeritifcate();
+        }
+
+        function updateCeritifcate() {
+            var canvas = document.getElementById("id_main_canvas");
+            var ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        var sliderXVal = document.getElementById("id_width_pos").value / 100;
+            var sliderYVal = (100 - document.getElementById("id_height_pos").value) / 100;
+            var sliderZoomVal = document.getElementById("id_zoom").value;
+            var expectedWidth = document.getElementById("id_expect_width").value;
+
+            sliderZoomVal = sliderZoomVal / 20 + 0.3;
+
+            let imgAvatar = document.getElementById("id_img_avatar");
+
+            let xPos = canvas.width * sliderXVal, yPos = canvas.height * sliderYVal;
+            var scaleFactor = (sliderZoomVal) * ((expectedWidth / 100) * canvas.width) / imgAvatar.width;
+            var dispWidth = imgAvatar.width * scaleFactor;
+            var dispHeight = imgAvatar.height * scaleFactor;
+
+            if (imgAvatar.complete)
+                ctx.drawImage(imgAvatar, xPos - dispWidth / 2, yPos - dispHeight / 2, dispWidth, dispHeight); // Or at whatever offset you like
+
+            
+            let imgBackground = document.getElementById("id_img_background");
+            if (imgBackground.complete)
+                ctx.drawImage(imgBackground, 0, 0, canvas.width, canvas.height); // Or at whatever offset you like
+
+            //text1
+                        let xPosText1 = 1368, yPosText1 = 1344;
+            ctx.textAlign = "left";
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "60PX SVN-Gilroy Bold";
+
+            //shadow
+                        ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = "transparent";
+            
+            ctx.fillText(document.getElementById("id_input_name").value, xPosText1, yPosText1);
+            
+            //text2
+                        //text3
+                        //text4
+            
+            //text5
+            
+            //text6
+            
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = "transparent";
+
+        }
+
+        function onDownloadClick() {
+            var canvas = document.getElementById("id_main_canvas");
+            var image = canvas.toDataURL('image/png');
+
+            // create temporary link
+            var tmpLink = document.createElement('a');
+
+            let fileName = document.getElementById("id_input_name");
+            if(fileName){
+                fileName = fileName.value;
+            }else{
+                fileName = Date.now();
+            }
+
+            tmpLink.download = 'KICHHOATHUYET '+fileName+'.png'; // set the name of the download file
+            tmpLink.href = image;
+
+            if(checkiphone()){
+                // Get all elements with class "example-class"
+                const elements = document.querySelectorAll('.img_iphone');
+
+                // Loop through each element and append text
+                for (let i = 0; i < elements.length; i++) {
+                    const element = elements[i];
+                    element.setAttribute('src', image);
+                }
+
+                const myElement = document.getElementById('iphone_mess');
+                myElement.classList.add('active');
+
+                /*const myElementA = document.getElementById('img_a');
+                myElementA.setAttribute('href', image);*/
+
+            }else {
+                // temporarily add link to body and initiate the download
+                document.body.appendChild(tmpLink);
+                tmpLink.click();
+                document.body.removeChild(tmpLink);
+            }
+
+        }
+
+        function checkiphone(){
+            const browserName = navigator.userAgent;
+
+            const substringsIM = ['iPhone', 'Messenger'];
+            const containsAllIM = substringsIM.every(substringsIM => browserName.toLowerCase().includes(substringsIM.toLowerCase()));
+
+            const substringsIZ = ['iPhone', 'Zalo'];
+            const containsAllIZ = substringsIZ.every(substringsIZ => browserName.toLowerCase().includes(substringsIZ.toLowerCase()));
+
+            return containsAllIM || containsAllIZ;
+
+        }
+
+        function checkandroid(){
+            const browserName = navigator.userAgent;
+
+            const substringsAM = ['Android', 'FBAV'];
+            const containsAllAM = substringsAM.every(substringsAM => browserName.toLowerCase().includes(substringsAM.toLowerCase()));
+
+            const substringsAZ = ['Android', 'Zalo'];
+            const containsAllAZ = substringsAZ.every(substringsAZ => browserName.toLowerCase().includes(substringsAZ.toLowerCase()));
+
+            return containsAllAM;
+
+        }
+
+        function onInputFileChange() {
+            input = document.getElementById("id_file_up");
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    document.getElementById("id_img_avatar").src = e.target.result;
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function onPageLoad() {
+            updateCeritifcate();
+            if(checkiphone()){
+                const myElement = document.getElementById('note_mess');
+                myElement.classList.add('active');
+            }else if(checkandroid()){
+                const myElement = document.getElementById('note_mess_all');
+                myElement.classList.add('active');
+            }
+        }
+
+        setTimeout(function (){
+            updateCeritifcate();
+        }, 500);
+
+        function onClosePopup(){
+            const myElement = document.getElementById('iphone_mess');
+            myElement.classList.remove('active');
+        }
+
+    </script>
+<style>.--savior-overlay-transform-reset {
+  transform: none !important;
+}
+.--savior-overlay-z-index-top {
+  z-index: 2147483643 !important;
+}
+.--savior-overlay-position-relative {
+  position: relative;
+}
+.--savior-overlay-position-static {
+  position: static !important;
+}
+.--savior-overlay-overflow-hidden {
+  overflow: hidden !important;
+}
+.--savior-overlay-overflow-x-visible {
+  overflow-x: visible !important;
+}
+.--savior-overlay-overflow-y-visible {
+  overflow-y: visible !important;
+}
+.--savior-overlay-z-index-reset {
+  z-index: auto !important;
+}
+.--savior-overlay-display-none {
+  display: none !important;
+}
+.--savior-overlay-clearfix {
+  clear: both;
+}
+.--savior-overlay-reset-filter {
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+.--savior-tooltip-host {
+  z-index: 9999;
+  position: absolute;
+  top: 0;
+}
+/*Override css styles for Twitch.tv*/
+main.--savior-overlay-z-index-reset {
+  z-index: auto !important;
+}
+.modal__backdrop.--savior-overlay-z-index-reset {
+  position: static !important;
+}
+main.--savior-overlay-z-index-top {
+  z-index: auto !important;
+}
+main.--savior-overlay-z-index-top .channel-root__player-container + div,
+main.--savior-overlay-z-index-top .video-player-hosting-ui__container + div {
+  opacity: 0.1;
+}
+/*Dirty hack for facebook big video page e.g: https://www.facebook.com/abc/videos/...*/
+.--savior-backdrop {
+  position: fixed !important;
+  z-index: 2147483642 !important;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw !important;
+  background-color: rgba(0,0,0,0.9);
+}
+.--savior-overlay-twitter-video-player {
+  position: fixed;
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+}
+.--savior-overlay-z-index-reset [class*="DivSideNavContainer"],
+.--savior-overlay-z-index-reset [class*="DivHeaderContainer"],
+.--savior-overlay-z-index-reset [class*="DivBottomContainer"],
+.--savior-overlay-z-index-reset [class*="DivCategoryListWrapper"],
+.--savior-overlay-z-index-reset [data-testid="sidebarColumn"],
+.--savior-overlay-z-index-reset header[role="banner"],
+.--savior-overlay-z-index-reset [data-testid="cellInnerDiv"]:not(.--savior-overlay-z-index-reset),
+.--savior-overlay-z-index-reset [aria-label="Home timeline"]>div:first-child,
+.--savior-overlay-z-index-reset [aria-label="Home timeline"]>div:nth-child(3) {
+  z-index: -1 !important;
+}
+.--savior-overlay-z-index-reset [data-testid="cellInnerDiv"] .--savior-backdrop+div {
+  z-index: 2147483643 !important;
+}
+.--savior-overlay-z-index-reset [data-testid="primaryColumn"]>[aria-label="Home timeline"] {
+  z-index: 0 !important;
+}
+.--savior-overlay-z-index-reset#mtLayer,
+.--savior-overlay-z-index-reset.media-layer {
+  z-index: 3000 !important;
+}
+.--savior-overlay-position-relative [class*="SecBar_secBar_"],
+.--savior-overlay-position-relative .woo-box-flex [class*="Frame_top_"] {
+  z-index: 0 !important;
+}
+.--savior-overlay-position-relative .vue-recycle-scroller__item-view:not(.--savior-overlay-z-index-reset),
+.--savior-overlay-position-relative .woo-panel-main[class*="BackTop_main_"],
+.--savior-overlay-position-relative [class*="Main_side_"] {
+  z-index: -1 !important;
+}
+/* Fix conflict css with zingmp3 */
+.zm-video-modal.--savior-overlay-z-index-reset {
+  position: absolute;
+}
+/* Dirty hack for xvideos99 */
+#page #main.--savior-overlay-z-index-reset {
+  z-index: auto !important;
+}
+/* Overlay for ok.ru */
+#vp_w.--savior-overlay-z-index-reset.media-layer.media-layer__video {
+  overflow-y: hidden;
+  z-index: 2147483643 !important;
+}
+/* Fix missing controller for tv.naver.com */
+.--savior-overlay-z-index-top.rmc_controller,
+.--savior-overlay-z-index-top.rmc_setting_intro,
+.--savior-overlay-z-index-top.rmc_highlight,
+.--savior-overlay-z-index-top.rmc_control_settings {
+  z-index: 2147483644 !important;
+}
+/* Dirty hack for douyi.com */
+.swiper-wrapper.--savior-overlay-z-index-reset .swiper-slide:not(.swiper-slide-active),
+.swiper-wrapper.--savior-overlay-transform-reset .swiper-slide:not(.swiper-slide-active) {
+  display: none;
+}
+.videoWrap + div > div {
+  pointer-events: unset;
+}
+/* Dirty hack for fpt.ai */
+.mfp-wrap.--savior-overlay-z-index-top {
+  position: relative;
+}
+.mfp-wrap.--savior-overlay-z-index-top .mfp-close {
+  display: none;
+}
+.mfp-wrap.--savior-overlay-z-index-top .mfp-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+section.--savior-overlay-z-index-reset>main[role="main"].--savior-overlay-z-index-reset + nav {
+  z-index: -1 !important;
+}
+section.--savior-overlay-z-index-reset>main[role="main"].--savior-overlay-z-index-reset section.--savior-overlay-z-index-reset div.--savior-overlay-z-index-reset ~ div {
+  position: relative;
+}
+.watching-movie #video-player.--savior-overlay-z-index-top {
+  z-index: 2147483644 !important;
+}
+div[class^="tiktok"].--savior-overlay-z-index-reset {
+  z-index: 2147483644 !important;
+}
+.--savior-lightoff-fix section:not(:has([class*="--savior-overlay-"])),
+.--savior-lightoff-fix section.section_video ~ section {
+  z-index: -1;
+  position: relative;
+}
+.--savior-lightoff-fix header,
+.--savior-lightoff-fix footer,
+.--savior-lightoff-fix .top-header,
+.--savior-lightoff-fix .swiper-container,
+.--savior-lightoff-fix #to_top,
+.--savior-lightoff-fix #button-adblock {
+  z-index: -1 !important;
+}
+@-moz-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@-o-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+</style></head>
+<body onload="onPageLoad()">
+<main>
+    <div class="container" id="main_wrap">
+        <div id="note_mess"><strong>Hãy mở bằng Safari hoặc Chrome để trải nghiệm tốt hơn</strong></div>
+        <div id="note_mess_all" class="note_mess"><strong>Chức năng này KHÔNG làm việc trên trình duyệt của bạn. Hãy mở bằng Safari hoặc Chrome để trải nghiệm tốt hơn</strong></div>
+        <div class="input-row justify-center">
+            <div class="row-name flex">
+                                <div class="flex-col">
+                <input class="full_name" id="id_input_name" type="text" placeholder="Nhập text 1..." value="HỌ VÀ TÊN" onkeyup="updateCeritifcate()" autofocus="">
+                </div>
+                                                                                                            </div>
         </div>
-        <div id="resultArea" style="display:none;">
-            <canvas id="mainCanvas"></canvas>
-            <button id="downloadBtn">TẢI THIỆP VỀ MÁY</button>
+        <div class="canvas-area">
+                        <div class="horizontal flex justify-center align-center" style=" max-width: 870px; width: 100%; ">
+                <div class="left justify-center align-center">
+                    <input type="file" id="id_file_up" accept="image/*" onchange="onInputFileChange()" hidden="">
+                    <label class="upload_btn" for="id_file_up" id="id_upload"><i class="fa fa-cloud-upload" aria-hidden="true"></i>&nbsp;Upload avatar</label>
+                </div>
+                <div class="left justify-center align-center">
+                    <label for="id_zoom" id="label-zoom">Zoom</label><br>
+                    <input type="range" min="1" max="100" step="1" value="1" id="id_zoom" oninput="updateCeritifcate()" onchange="updateCeritifcate()">
+                </div>
+                <div class="mid">
+                    <label for="id_width_pos" id="label-width">Chiều ngang</label><br>
+                    <input type="range" min="1" max="100" step="1" value="78" class="slider" id="id_width_pos" oninput="updateCeritifcate()" onchange="updateCeritifcate()">
+                </div>
+                <div class="right justify-center align-center">
+                    <label for="id_height_pos" id="label-height">Chiều dọc</label><br>
+                    <input type="range" min="1" max="100" step="1" value="60" id="id_height_pos" oninput="updateCeritifcate()" onchange="updateCeritifcate()">
+                </div>
+                <div class="right justify-center align-center">
+                    <label for="id_height_pos" id="label-height">Tỷ lệ hình</label><br>
+                    <input type="range" min="1" max="100" step="1" value="90" id="id_expect_width" oninput="updateCeritifcate()" onchange="updateCeritifcate()">
+                </div>
+            </div>
+                        <div class="flex canvas-row justify-center" style=" max-width: 870px; width: 100%; ">
+                <canvas id="id_main_canvas" width="2000" height="2000"></canvas>
+            </div>
+        </div>
+        <div class="download-btn flex justify-center">
+            <button id="id_download" hidden="" onclick="onDownloadClick()">Download</button>
+            <label class="upload_btn" for="id_download" id="download"><i class="fa fa-download"></i>&nbsp;Download</label>
+        </div>
+                <img class="hidden_img no-lazy" id="id_img_avatar" data-src="https://followme.vn/duyenthi-group/wp-content/uploads/2026/03/meme-chay-deadline-vua-thuc-te-vua-hai-huoc-nen-de-lan-toa-rong-rai.jpg" src="https://followme.vn/duyenthi-group/wp-content/uploads/2026/03/meme-chay-deadline-vua-thuc-te-vua-hai-huoc-nen-de-lan-toa-rong-rai.jpg" onload="updateCeritifcate()">
+                <img class="hidden_img no-lazy" id="id_img_background" data-src="https://followme.vn/duyenthi-group/wp-content/uploads/2026/03/CHATBOT.png" src="https://followme.vn/duyenthi-group/wp-content/uploads/2026/03/CHATBOT.png" onload="updateCeritifcate()">
+        <div id="iphone_mess">
+            <strong>Hãy ấn và giữ vào ảnh bên dưới để download. </strong>
+            <img src="" class="img_iphone">
+            <div class="download-btn flex justify-center">
+                <button id="id_closepopup" hidden="" onclick="onClosePopup()">Đóng</button>
+                <label class="upload_btn" for="id_closepopup" id="download"><i class="fa fa-download"></i>&nbsp;Đóng</label>
+            </div>
         </div>
     </div>
+</main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script>
-        // PHẦN JAVASCRIPT - XỬ LÝ LOGIC
-        const imageInput = document.getElementById('imageInput');
-        const imageToCrop = document.getElementById('imageToCrop');
-        const cropButton = document.getElementById('cropButton');
-        const generateBtn = document.getElementById('generateBtn');
-        const mainCanvas = document.getElementById('mainCanvas');
-        const ctx = mainCanvas.getContext('2d');
-        let cropper, croppedImageDataURL = "";
 
-        imageInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    imageToCrop.src = event.target.result;
-                    document.getElementById('cropArea').style.display = 'block';
-                    if (cropper) cropper.destroy();
-                    cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1 });
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
-        cropButton.onclick = () => {
-            croppedImageDataURL = cropper.getCroppedCanvas().toDataURL('image/png');
-            document.getElementById('cropArea').style.display = 'none';
-            alert("Đã nhận ảnh!");
-        };
-
-        generateBtn.onclick = () => {
-            const name = document.getElementById('userName').value;
-            if (!name || !croppedImageDataURL) return alert("Thiếu tên hoặc ảnh!");
-            
-            const template = new Image();
-            template.crossOrigin = "anonymous";
-            template.src = 'phoi-thiep.jpg'; // Đảm bảo file này có trên GitHub
-
-            template.onload = () => {
-                mainCanvas.width = template.width;
-                mainCanvas.height = template.height;
-                ctx.drawImage(template, 0, 0);
-
-                const userImg = new Image();
-                userImg.src = croppedImageDataURL;
-                userImg.onload = () => {
-                    // Bạn cần chỉnh tọa độ x, y, w, h ở đây cho khớp phôi của bạn
-                    ctx.drawImage(userImg, 340, 250, 400, 400); 
-                    ctx.font = "bold 50px Arial";
-                    ctx.fillStyle = "#000000";
-                    ctx.textAlign = "center";
-                    ctx.fillText(name.toUpperCase(), mainCanvas.width / 2, 850);
-                    document.getElementById('resultArea').style.display = 'block';
-                };
-            };
-        };
-
-        document.getElementById('downloadBtn').onclick = () => {
-            const link = document.createElement('a');
-            link.download = 'thiep.png';
-            link.href = mainCanvas.toDataURL();
-            link.click();
-        };
-    </script>
-</body>
-</html>
+</body><en2vi-host class="corom-element" version="3" style="all: initial; position: absolute; top: 0; left: 0; right: 0; height: 0; margin: 0; text-align: left; z-index: 10000000000; pointer-events: none; border: none; display: block"></en2vi-host><savior-host style="all: unset; position: absolute; top: 0; left: 0; z-index: 99999999999999; display: block !important; overflow: unset"></savior-host></html>
