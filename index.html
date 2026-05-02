@@ -117,12 +117,12 @@
             ctx.restore();
 
             // 3. Viết tên vào ô đỏ dựa theo tỉ lệ
-            const fontSize = Math.round(W * 0.045); // Font chữ tự co giãn theo phôi
+            const fontSize = Math.round(W * 0.030); // Font chữ tự co giãn theo phôi
             ctx.font = `bold ${fontSize}px Arial`;
             ctx.fillStyle = "#ffffff";
             ctx.textAlign = "center";
             // Tọa độ tên (76.5% ngang, 71% dọc)
-            ctx.fillText(name.toUpperCase(), W * 0.765, H * 0.642);
+            ctx.fillText(name.toUpperCase(), W * 0.765, H * 0.655);
 
             // 4. Xuất ảnh
             const link = document.createElement('a');
