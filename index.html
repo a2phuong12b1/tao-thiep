@@ -3,54 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo Thiệp Mời Tự Động</title>
-    <!-- Thư viện cắt ảnh chuẩn -->
+    <title>Tạo Thiệp Preview Trực Tiếp</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
         body {
-            margin: 0; padding: 20px; font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); /* Nền tối sang trọng */
-            color: #fff; display: flex; justify-content: center; min-height: 100vh;
+            margin: 0; padding: 20px; font-family: sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff; display: flex; justify-content: center;
         }
         .container {
-            background: #ffffff; color: #333; padding: 30px;
-            border-radius: 20px; max-width: 450px; width: 100%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center;
+            background: white; color: #333; padding: 25px;
+            border-radius: 15px; max-width: 500px; width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center;
         }
-        .btn {
-            background: #e94560; color: white; border: none;
-            padding: 15px; width: 100%; border-radius: 10px;
-            font-weight: bold; cursor: pointer; margin-top: 10px;
+        /* Khu vực hiển thị preview khi đang cắt */
+        .cropper-wrapper {
+            position: relative;
+            width: 100%;
+            margin-top: 20px;
+            display: none;
         }
+        /* Lớp nền phôi thiệp phía sau khung cắt */
+        #preview-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            z-index: 1;
+            pointer-events: none; /* Để không cản trở thao tác cắt */
+        }
+        .img-container {
+            width: 100%;
+            z-index: 2;
+            background-color: transparent !important;
+        }
+        /* Làm cho khung cắt Cropper trong suốt để thấy nền phôi */
+        .cropper-modal { opacity: 0.2 !important; }
+        .cropper-bg { background-image: none !important; background-color: transparent !important; }
+
         input[type="text"] {
-            width: 100%; padding: 15px; margin: 15px 0;
-            border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box;
+            width: 100%; padding: 12px; margin: 15px 0;
+            border: 2px solid #ddd; border-radius: 8px;
         }
-        #cropArea { margin-top: 20px; }
-        .img-container { max-height: 300px; overflow: hidden; margin-bottom: 10px; border-radius: 10px; }
-        canvas { width: 100%; border-radius: 10px; margin-top: 20px; border: 2px solid #e94560; }
+        button {
+            background: #e94560; color: white; border: none;
+            padding: 12px; width: 100%; border-radius: 8px;
+            font-weight: bold; cursor: pointer; margin-top: 5px;
+        }
+        canvas { width: 100%; border-radius: 10px; margin-top: 20px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 style="color: #1a1a2e;">TẠO THIỆP MỜI</h2>
+        <h2>TẠO THIỆP TRỰC TIẾP</h2>
         <input type="file" id="imageInput" accept="image/*">
         
-        <div id="cropArea" style="display:none;">
-            <div class="img-container"><img id="imageToCrop"></div>
-            <button class="btn" id="cropButton">XÁC NHẬN CẮT ẢNH</button>
+        <div class="cropper-wrapper" id="wrapper">
+            <!-- Ảnh phôi hiện lên để người dùng canh chỉnh -->
+            <img id="preview-bg" src="phoi-thiep.jpg">
+            <div class="img-container">
+                <img id="imageToCrop">
+            </div>
+            <button id="cropButton">XÁC NHẬN VỊ TRÍ</button>
         </div>
 
-        <input type="text" id="userName" placeholder="NHẬP HỌ TÊN CỦA BẠN">
-        <button class="btn" id="generateBtn">TẠO THIỆP NGAY</button>
-
-        <div id="resultArea" style="display:none;">
-            <canvas id="mainCanvas"></canvas>
-            <button class="btn" id="downloadBtn" style="background: #0f3460;">TẢI THIỆP VỀ MÁY</button>
-        </div>
+        <input type="text" id="userName" placeholder="NHẬP HỌ TÊN">
+        <button id="generateBtn">XUẤT THIỆP</button>
+        
+        <canvas id="mainCanvas"></canvas>
+        <button id="downloadBtn" style="display:none; background: #0f3460;">TẢI ẢNH VỀ</button>
     </div>
 
-    <!-- Nhúng thư viện xử lý -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         const imageInput = document.getElementById('imageInput');
@@ -59,7 +81,8 @@
         const generateBtn = document.getElementById('generateBtn');
         const mainCanvas = document.getElementById('mainCanvas');
         const ctx = mainCanvas.getContext('2d');
-        let cropper, croppedImageDataURL = "";
+        
+        let cropper, croppedData = "";
 
         imageInput.onchange = (e) => {
             const file = e.target.files[0];
@@ -67,27 +90,37 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     imageToCrop.src = event.target.result;
-                    document.getElementById('cropArea').style.display = 'block';
+                    document.getElementById('wrapper').style.display = 'block';
                     if (cropper) cropper.destroy();
-                    cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1 });
+                    
+                    cropper = new Cropper(imageToCrop, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        guides: false,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true
+                    });
                 };
                 reader.readAsDataURL(file);
             }
         };
 
         cropButton.onclick = () => {
-            croppedImageDataURL = cropper.getCroppedCanvas().toDataURL('image/png');
-            document.getElementById('cropArea').style.display = 'none';
-            alert("Đã nhận ảnh!");
+            croppedData = cropper.getCroppedCanvas().toDataURL('image/png');
+            alert("Đã khớp vị trí!");
+            document.getElementById('wrapper').style.display = 'none';
         };
 
         generateBtn.onclick = () => {
             const name = document.getElementById('userName').value;
-            if (!name || !croppedImageDataURL) return alert("Vui lòng chọn ảnh và nhập tên!");
-            
+            if (!name || !croppedData) return alert("Vui lòng nhập tên và cắt ảnh!");
+
             const template = new Image();
             template.crossOrigin = "anonymous";
-            template.src = 'phoi-thiep.jpg'; // Tên file bạn đã upload lên GitHub
+            template.src = 'phoi-thiep.jpg';
 
             template.onload = () => {
                 mainCanvas.width = template.width;
@@ -95,17 +128,18 @@
                 ctx.drawImage(template, 0, 0);
 
                 const userImg = new Image();
-                userImg.src = croppedImageDataURL;
+                userImg.src = croppedData;
                 userImg.onload = () => {
-                    // CĂN CHỈNH TỌA ĐỘ: Thay đổi các số này để khớp với phôi của bạn
-                    ctx.drawImage(userImg, 300, 200, 400, 400); 
+                    // TỌA ĐỘ VẼ THIỆT (Cần khớp với vị trí preview ở trên)
+                    ctx.drawImage(userImg, 340, 200, 400, 400); 
                     
                     ctx.font = "bold 50px Arial";
-                    ctx.fillStyle = "#000"; // Màu chữ
+                    ctx.fillStyle = "#000";
                     ctx.textAlign = "center";
-                    ctx.fillText(name.toUpperCase(), mainCanvas.width / 2, 800);
+                    ctx.fillText(name.toUpperCase(), mainCanvas.width / 2, 850);
                     
-                    document.getElementById('resultArea').style.display = 'block';
+                    mainCanvas.style.display = 'block';
+                    document.getElementById('downloadBtn').style.display = 'block';
                 };
             };
         };
