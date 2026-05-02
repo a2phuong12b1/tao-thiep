@@ -12,17 +12,34 @@
         .card-wrapper { position: relative; width: 100%; }
         #phoi-bg { width: 100%; display: block; }
         
-        /* CĂN CHỈNH PREVIEW THEO TỈ LỆ % */
+        /* VÒNG TRÒN PREVIEW */
         .photo-slot {
             position: absolute;
-            top: 26%; /* Tọa độ dọc của vòng tròn vàng */
-            left: 77.5%; /* Tọa độ ngang của vòng tròn vàng */
-            width: 28.4%;  /* Độ lớn vòng tròn */
+            top: 26%; 
+            left: 77.5%; 
+            width: 28.4%;  
             aspect-ratio: 1/1;
             transform: translate(-50%, 0);
             z-index: 5;
             border-radius: 50%;
             overflow: hidden;
+        }
+
+        /* TÊN HIỂN THỊ REAL-TIME TRÊN PREVIEW */
+        #previewName {
+            position: absolute;
+            top: 65.5%; /* Khớp với tỉ lệ H * 0.655 */
+            left: 76.5%; /* Khớp với tỉ lệ W * 0.765 */
+            transform: translate(-50%, -50%);
+            width: 40%;
+            text-align: center;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 3.5vw; /* Tự co giãn theo màn hình */
+            text-transform: uppercase;
+            pointer-events: none; /* Không cản trở thao tác chuột */
+            z-index: 10;
+            white-space: nowrap;
         }
         
         .controls { padding: 20px; background: #fff; border-radius: 20px 20px 0 0; margin-top: -20px; position: relative; z-index: 10; }
@@ -30,6 +47,10 @@
         .btn-upload { background: #ffcc00; color: #004d25; padding: 15px; border-radius: 30px; display: block; text-align: center; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
         .btn-generate { background: #004d25; color: #fff; border: none; padding: 18px; width: 100%; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         #mainCanvas { display: none; }
+
+        @media (min-width: 500px) {
+            #previewName { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
@@ -37,9 +58,14 @@
 <div class="app-container">
     <div class="card-wrapper">
         <img id="phoi-bg" src="phoi-thiep.png" alt="Phôi Thiệp">
+        
+        <!-- Ảnh preview -->
         <div class="photo-slot">
             <img id="imageToCrop" style="display: none;">
         </div>
+
+        <!-- Tên preview real-time -->
+        <div id="previewName"></div>
     </div>
 
     <div class="controls">
@@ -47,7 +73,10 @@
             BƯỚC 1: CHỌN ẢNH CỦA BẠN
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
         </label>
-        <input type="text" id="userName" placeholder="BƯỚC 2: NHẬP TÊN CỦA BẠN">
+        
+        <!-- Thêm sự kiện oninput để cập nhật tên ngay lập tức -->
+        <input type="text" id="userName" placeholder="BƯỚC 2: NHẬP TÊN CỦA BẠN" oninput="updatePreviewName(this.value)">
+        
         <button class="btn-generate" id="generateBtn">BƯỚC 3: TẠO & TẢI THIỆP</button>
     </div>
     <canvas id="mainCanvas"></canvas>
@@ -58,9 +87,15 @@
     const imageInput = document.getElementById('imageInput');
     const imageToCrop = document.getElementById('imageToCrop');
     const generateBtn = document.getElementById('generateBtn');
+    const previewNameDiv = document.getElementById('previewName');
     const mainCanvas = document.getElementById('mainCanvas');
     const ctx = mainCanvas.getContext('2d');
     let cropper;
+
+    // Hàm cập nhật tên hiển thị trên ảnh preview
+    function updatePreviewName(val) {
+        previewNameDiv.innerText = val.toUpperCase();
+    }
 
     imageInput.onchange = (e) => {
         const file = e.target.files[0];
@@ -93,21 +128,18 @@
         template.src = 'phoi-thiep.png';
 
         template.onload = () => {
-            // Lấy kích thước thật của phôi ảnh
             const W = template.width;
             const H = template.height;
             mainCanvas.width = W;
             mainCanvas.height = H;
             
-            // 1. Vẽ phôi
             ctx.drawImage(template, 0, 0);
 
-            // 2. Tính toán tọa độ vẽ ảnh dựa theo tỉ lệ kích thước phôi
             const croppedCanvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
             
-            const circleX = W * 0.765; // Tâm ngang (76.5%)
-            const circleY = H * 0.405; // Tâm dọc (40.5%)
-            const radius = W * 0.155;  // Bán kính (15.5%)
+            const circleX = W * 0.765;
+            const circleY = H * 0.405;
+            const radius = W * 0.155;
             
             ctx.save();
             ctx.beginPath();
@@ -116,15 +148,13 @@
             ctx.drawImage(croppedCanvas, circleX - radius, circleY - radius, radius * 2, radius * 2);
             ctx.restore();
 
-            // 3. Viết tên vào ô đỏ dựa theo tỉ lệ
-            const fontSize = Math.round(W * 0.030); // Font chữ tự co giãn theo phôi
+            // Vẽ tên lên Canvas (để tải về) khớp với tỉ lệ đã yêu cầu
+            const fontSize = Math.round(W * 0.027); 
             ctx.font = `bold ${fontSize}px Arial`;
             ctx.fillStyle = "#ffffff";
             ctx.textAlign = "center";
-            // Tọa độ tên (76.5% ngang, 71% dọc)
-            ctx.fillText(name.toUpperCase(), W * 0.765, H * 0.665);
+            ctx.fillText(name.toUpperCase(), W * 0.765, H * 0.670);
 
-            // 4. Xuất ảnh
             const link = document.createElement('a');
             link.download = 'thiep-moi-duyen-thi.png';
             link.href = mainCanvas.toDataURL('image/png', 1.0);
