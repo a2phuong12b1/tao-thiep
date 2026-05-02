@@ -1,15 +1,66 @@
 body {
-    /* https://followme.vn/duyenthi-group/tao-thiep/459-2/?zarsrc=273&utm_source=zalo&utm_medium=zalo&utm_campaign=zalo */
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
     margin: 0;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Tạo nền gradient sang trọng */
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
     display: flex;
-    align-items: center;
     justify-content: center;
 }
 
 .container {
-    background: rgba(255, 255, 255, 0.95); /* Nền trắng trong suốt nhẹ */
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    background: #ffffff;
+    color: #333;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    text-align: center;
 }
+
+h1 { color: #1a1a2e; margin-bottom: 5px; }
+
+.input-section { margin-top: 25px; }
+
+input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    margin: 15px 0;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-size: 16px;
+    text-align: center;
+}
+
+button {
+    background: #e94560;
+    color: white;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover { background: #0f3460; }
+
+.custom-file-upload {
+    display: block;
+    padding: 12px;
+    background: #f0f0f0;
+    border: 2px dashed #bbb;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+#imageInput { display: none; }
+
+.img-container { max-height: 300px; margin-bottom: 10px; overflow: hidden; }
+
+canvas { width: 100%; border-radius: 10px; margin: 20px 0; border: 1px solid #ddd; }
